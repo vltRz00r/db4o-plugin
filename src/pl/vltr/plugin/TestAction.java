@@ -25,9 +25,10 @@ import com.intellij.ui.table.JBTable;
  */
 public class TestAction implements ToolWindowFactory {
 
-    private static JButton openBtn = new JButton("Open ...");
+    private static JButton openBtn = new JButton("Open");
     private static JButton fetchBtn = new JButton("Get Objects");
     private static JComboBox<GenericClass> classCombo = null;
+    private static JPanel topPanel = new JPanel(new MigLayout());
     private static JPanel mainPanel = new JPanel(new MigLayout());
     private Boolean fileOpened = false;
 
@@ -36,7 +37,9 @@ public class TestAction implements ToolWindowFactory {
         container.setLayout(migLayout);
         container.removeAll();
 
-        container.add(openBtn);
+        topPanel.add(openBtn);
+        container.add(topPanel, "w 100%, wrap");
+        container.add(mainPanel, "w 100%, h 500px, span, wrap");
     }
 
     @Override
@@ -78,17 +81,10 @@ public class TestAction implements ToolWindowFactory {
                 }
                 //TODO ?? :-(
 
-                JBScrollPane scrollPane = new JBScrollPane();
-                scrollPane.setSize(500, 300);
-                scrollPane.add(tab);
-                scrollPane.invalidate();
-
-                /*mainPanel.add(scrollPane);
-                mainPanel.setSize(500, 500);
-                mainPanel.invalidate();*/
-
-                container.add(scrollPane, "span, wrap");
-                container.validate();
+                mainPanel.removeAll();
+                JBScrollPane scrollPane = new JBScrollPane(tab);
+                mainPanel.add(scrollPane, "w 100%, span, wrap");
+                mainPanel.validate();
             }
         });
 
@@ -104,15 +100,18 @@ public class TestAction implements ToolWindowFactory {
                         DbViewer.getInstance().open(path);
                         List<GenericClass> classes = DbViewer.getInstance().getClasses();
                         classCombo = new JComboBox<GenericClass>(classes.toArray(new GenericClass[classes.size()]));
-                        container.add(classCombo);
-                        container.add(fetchBtn, "wrap");
-                        container.validate();
-                        openBtn.setText("Close ...");
+                        topPanel.add(classCombo);
+                        topPanel.add(fetchBtn, "wrap");
+                        topPanel.validate();
+                        openBtn.setText("Close");
                         fileOpened = true;
                     }
                 } else {
                     DbViewer.getInstance().close();
-                    openBtn.setText("Open ...");
+                    topPanel.removeAll();
+                    openBtn.setText("Open");
+                    topPanel.add(openBtn);
+                    mainPanel.removeAll();
                     fileOpened = false;
                     initLayout(component, container);
                 }

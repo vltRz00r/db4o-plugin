@@ -25,7 +25,7 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-      <toolWindow id="My Sample Tool Window" anchor="right" factoryClass="pl.vltr.plugin.TestAction"></toolWindow>
+      <toolWindow id="db4o" anchor="bottom" factoryClass="pl.vltr.plugin.TestAction"></toolWindow>
   </extensions>
 
   <application-components>
