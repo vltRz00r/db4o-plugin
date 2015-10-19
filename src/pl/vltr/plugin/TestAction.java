@@ -79,10 +79,8 @@ public class TestAction implements ToolWindowFactory {
                 //TODO ?? :-(
 
                 JBScrollPane scrollPane = new JBScrollPane();
-                tab.setSize(300, 300);
-                scrollPane.add(tab.getTableHeader());
+                scrollPane.setSize(500, 300);
                 scrollPane.add(tab);
-                scrollPane.setSize(500, 500);
                 scrollPane.invalidate();
 
                 /*mainPanel.add(scrollPane);
