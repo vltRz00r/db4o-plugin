@@ -1,4 +1,4 @@
-package pl.vltr.plugin;
+package pl.vltr.db4oplugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,6 +107,11 @@ public class DbViewer {
         }
 
         return retList;
+    }
+
+    public void deleteObject(Object obj){
+        db.delete(obj);
+        db.commit();
     }
 
 }

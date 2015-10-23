@@ -1,18 +1,12 @@
 <idea-plugin version="2">
-  <id>com.yourcompany.unique.plugin.id</id>
-  <name>Plugin display name here</name>
+  <id>pl.vltr.db4oplugin</id>
+  <name>db4o plugin</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <vendor email="vltr@o2.pl" url="http://www.yourcompany.com">vltRz00r</vendor>
 
-  <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
-    ]]></description>
+  <description><![CDATA[ db4o integration ]]></description>
 
-  <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
-    ]]>
+  <change-notes><![CDATA[ ]]>
   </change-notes>
 
   <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
@@ -20,12 +14,12 @@
 
   <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
-  <!-- uncomment to enable plugin in all products
+  <!-- uncomment to enable db4oplugin in all products
   <depends>com.intellij.modules.lang</depends>
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-      <toolWindow id="db4o" anchor="bottom" factoryClass="pl.vltr.plugin.TestAction"></toolWindow>
+      <toolWindow id="db4o" anchor="bottom" factoryClass="pl.vltr.db4oplugin.TestAction"></toolWindow>
   </extensions>
 
   <application-components>
