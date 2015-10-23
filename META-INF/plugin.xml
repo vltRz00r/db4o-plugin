@@ -2,9 +2,9 @@
   <id>pl.vltr.db4oplugin</id>
   <name>db4o plugin</name>
   <version>1.0</version>
-  <vendor email="vltr@o2.pl" url="http://www.yourcompany.com">vltRz00r</vendor>
+  <vendor email="vltr@o2.pl" url="https://github.com/vltRz00r/db4o-plugin">vltRz00r</vendor>
 
-  <description><![CDATA[ db4o integration ]]></description>
+  <description><![CDATA[ db4o integration - https://github.com/vltRz00r/db4o-plugin]]></description>
 
   <change-notes><![CDATA[ ]]>
   </change-notes>

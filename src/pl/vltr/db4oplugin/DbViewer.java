@@ -13,9 +13,6 @@ import com.db4o.reflect.ReflectField;
 import com.db4o.reflect.generic.GenericClass;
 import com.db4o.reflect.generic.GenericObject;
 
-/**
- * Created by kwichowski on 2015-10-07.
- */
 public class DbViewer {
 
     private static DbViewer instance;

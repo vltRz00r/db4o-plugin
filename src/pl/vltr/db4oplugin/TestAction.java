@@ -23,9 +23,6 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 
-/**
- * Created by kwichowski on 2015-10-06.
- */
 public class TestAction implements ToolWindowFactory, ActionListener {
 
     private static JButton openBtn = new JButton("Open");

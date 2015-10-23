@@ -7,9 +7,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * Created by kwichowski on 2015-10-23.
- */
 public class ActionFactory {
 
     public static Action delAction(Object object, Consumer<Void> afterExec) {
