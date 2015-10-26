@@ -1,7 +1,9 @@
 package pl.vltr.db4oplugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
@@ -27,6 +29,20 @@ public class DbViewer {
             instance = new DbViewer();
         }
         return instance;
+    }
+
+    public static Map<String, Object> objData(Object obj) {
+        Map<String, Object> values = new HashMap<String, Object>();
+        Class c = obj.getClass();
+        if (c == GenericObject.class) {
+            GenericObject go = (GenericObject) obj;
+            GenericClass realClass = go.getGenericClass();
+            ReflectField[] fields = getFields(realClass);
+            for (int i = 0; i < fields.length; i++) {
+                values.put(fields[i].getName(), go.get(i));
+            }
+        }
+        return values;
     }
 
     public static ReflectField[] getFields(GenericClass gc) {
@@ -62,7 +78,7 @@ public class DbViewer {
         db = Db4oEmbedded.openFile(conf, path);
     }
 
-    public void close(){
+    public void close() {
         db.close();
     }
 
@@ -106,7 +122,7 @@ public class DbViewer {
         return retList;
     }
 
-    public void deleteObject(Object obj){
+    public void deleteObject(Object obj) {
         db.delete(obj);
         db.commit();
     }

@@ -23,7 +23,7 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 
-public class TestAction implements ToolWindowFactory, ActionListener {
+public class TestAction implements ToolWindowFactory {
 
     private static JButton openBtn = new JButton("Open");
     private static JButton fetchBtn = new JButton("Get Objects");
@@ -89,7 +89,6 @@ public class TestAction implements ToolWindowFactory, ActionListener {
             tab.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    //super.mouseReleased(e);
                     int r = tab.rowAtPoint(e.getPoint());
                     if (r >= 0 && r < tab.getRowCount()) {
                         tab.setRowSelectionInterval(r, r);
@@ -101,12 +100,14 @@ public class TestAction implements ToolWindowFactory, ActionListener {
                     if (rowindex < 0)
                         return;
                     if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
+                        Object obj = objects.get(tab.getSelectedRow());
+
                         JPopupMenu popup = new JPopupMenu("Menu");
-                        popup.add(new JMenuItem(ActionFactory.delAction(objects.get(tab.getSelectedRow()), (Void) -> {
+                        popup.add(new JMenuItem(ActionFactory.delAction(obj, (Void) -> {
                             classCombo.setSelectedItem(lastChosenClass);
                             fetchBtn.doClick();
                         })));
-                        //popup.add(new JMenuItem("View more", 2));
+                        popup.add(new JMenuItem(ActionFactory.editAction(obj, DbViewer.getInstance().objData(obj))));
                         popup.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
@@ -144,10 +145,5 @@ public class TestAction implements ToolWindowFactory, ActionListener {
                 initLayout(component, container);
             }
         });
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("ACT: " + e.getID());
     }
 }
