@@ -60,10 +60,8 @@ public class ActionFactory {
         Action editAction = new Action() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFrame f = new JFrame("TEST");
-                f.setSize(300, 300);
-                f.setBackground(Color.white);
-                f.setVisible(true);
+                EditFrame ef = new EditFrame(object, values);
+                ef.setVisible(true);
             }
 
             @Override
