@@ -14,11 +14,6 @@ public class ActionFactory {
 
     public static Action delAction(Object object, Consumer<Void> afterExec) {
         Action delAction = new Action() {
-            /*@Override
-            public String toString() {
-                return "Delete object";
-            }*/
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 DbViewer.getInstance().deleteObject(object);
@@ -58,11 +53,11 @@ public class ActionFactory {
         return delAction;
     }
 
-    public static Action editAction(Object object, Map<String, Object> values, GenericClass clazz) {
+    public static Action editAction(Object object, Map<String, Object> values, GenericClass clazz, Consumer<Void> afterExec) {
         Action editAction = new Action() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EditFrame ef = new EditFrame(object, values, clazz);
+                EditFrame ef = new EditFrame(object, values, clazz, afterExec);
                 ef.setVisible(true);
             }
 

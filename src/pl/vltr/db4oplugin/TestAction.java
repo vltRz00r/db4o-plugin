@@ -107,7 +107,11 @@ public class TestAction implements ToolWindowFactory {
                             classCombo.setSelectedItem(lastChosenClass);
                             fetchBtn.doClick();
                         })));
-                        popup.add(new JMenuItem(ActionFactory.editAction(obj, DbViewer.getInstance().objData(obj), lastChosenClass)));
+                        popup.add(new JMenuItem(ActionFactory.editAction(obj, DbViewer.getInstance().objData(obj), lastChosenClass,
+                                (Void) -> {
+                                    classCombo.setSelectedItem(lastChosenClass);
+                                    fetchBtn.doClick();
+                                })));
                         popup.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }

@@ -1,8 +1,10 @@
 package pl.vltr.db4oplugin;
 
+import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 import javax.swing.text.html.HTMLDocument;
@@ -32,15 +34,13 @@ public class EditFrame extends JFrame {
     private Map<String, JBTextField> fields;
     private Map<String, Integer> types;
 
-    public EditFrame(Object object, Map<String, Object> values, GenericClass clazz) {
+    public EditFrame(Object object, Map<String, Object> values, GenericClass clazz, Consumer<Void> afterExec) {
         super("Edit object");
         setObject(object);
         setValues(values);
         setClazz(clazz);
         this.fields = new HashMap<String, JBTextField>();
         this.types = new HashMap<String, Integer>();
-
-        setSize(400, 300);
 
         lay = new MigLayout();
         setLayout(lay);
@@ -55,9 +55,15 @@ public class EditFrame extends JFrame {
         saveBtn.addActionListener((e) -> {
             saveObject();
             dispose();
+            afterExec.accept(null);
         });
         add(saveBtn, "w 100%, wrap");
         pack();
+
+        setSize(getWidth() + 100, getHeight());
+
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
     }
 
     private void saveObject() {
@@ -87,7 +93,7 @@ public class EditFrame extends JFrame {
                 newVal = Character.valueOf(((String)newVal).charAt(0));
             }
             else if (type == TYPE_OTHER) {
-                // newVal = null;
+                newVal = values.get(key);
             }
 
             rField.set(object, newVal);
@@ -123,7 +129,7 @@ public class EditFrame extends JFrame {
             panel.add(field, "w 75%");
         } else {
             types.put(key, TYPE_OTHER);
-            JBTextField field = new JBTextField("(object)");
+            JBTextField field = new JBTextField(value.toString());
             fields.put(key, field);
             JButton moreBtn = new JButton("...");
             panel.add(field, "w 60%");
