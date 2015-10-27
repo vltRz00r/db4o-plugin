@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import com.db4o.reflect.ReflectClass;
+import javafx.scene.control.TableSelectionModel;
 import net.miginfocom.swing.MigLayout;
 
 import com.db4o.reflect.ReflectField;
@@ -60,14 +61,10 @@ public class SelectFrame extends JFrame {
             dtm.addRow(vals);
         }
 
-        System.out.println("OBJ COUNT: " + DbViewer.getInstance().getObjects(reflectClass).size());
-        System.out.println("FIELD COUNT: " + DbViewer.getInstance().getFields(reflectClass).length);
-
         JBScrollPane scrollPane = new JBScrollPane(tab);
         add(scrollPane, "w 100%, wrap");
-        add(new JButton("OK"), "w 100%, wrap");
-        pack();
-        setSize(getWidth() + 100, getHeight());
+        add(new JButton("Select"), "w 100%, wrap");
+        setSize(700, 400);
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);

@@ -22,7 +22,9 @@ public class EditFrame extends JFrame {
     private final static Integer TYPE_FLOAT = 2;
     private final static Integer TYPE_DOUBLE = 3;
     private final static Integer TYPE_CHAR = 4;
-    private final static Integer TYPE_OTHER = 5;
+    private final static Integer TYPE_BOOLEAN = 5;
+
+    private final static Integer TYPE_OTHER = 6;
 
     private MigLayout lay;
 
@@ -87,6 +89,8 @@ public class EditFrame extends JFrame {
                 newVal = Float.valueOf((String) newVal);
             } else if (type == TYPE_CHAR) {
                 newVal = Character.valueOf(((String) newVal).charAt(0));
+            } else if (type == TYPE_BOOLEAN) {
+                newVal = Boolean.valueOf((String)newVal);
             } else if (type == TYPE_OTHER) {
                 newVal = values.get(key);
             }
@@ -104,10 +108,11 @@ public class EditFrame extends JFrame {
         Boolean isFloat = (value instanceof Float);
         Boolean isDouble = (value instanceof Double);
         Boolean isChar = (value instanceof Character);
+        Boolean isBoolean = (value instanceof Boolean);
 
         panel.setLayout(new MigLayout());
         panel.add(new JBLabel(key + ":"), "w 25%");
-        if (isInteger || isString || isFloat || isDouble || isChar) {
+        if (isInteger || isString || isFloat || isDouble || isChar || isBoolean) {
             if (isInteger)
                 primitiveTypes.put(key, TYPE_INTEGER);
             else if (isString)
@@ -118,6 +123,8 @@ public class EditFrame extends JFrame {
                 primitiveTypes.put(key, TYPE_DOUBLE);
             else if (isChar)
                 primitiveTypes.put(key, TYPE_CHAR);
+            else if (isBoolean)
+                primitiveTypes.put(key, TYPE_BOOLEAN);
 
             JBTextField field = new JBTextField(String.valueOf(value));
             fields.put(key, field);
@@ -129,6 +136,7 @@ public class EditFrame extends JFrame {
             JBTextField field = new JBTextField(value != null ? value.toString() : "");
             fields.put(key, field);
             JButton moreBtn = new JButton("...");
+            moreBtn.setEnabled(false);
             moreBtn.addActionListener((e) -> {
                 SelectFrame sf = new SelectFrame(complexTypes.get(key), value);
                 sf.setVisible(true);
