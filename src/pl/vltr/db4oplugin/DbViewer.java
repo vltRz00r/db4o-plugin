@@ -127,4 +127,9 @@ public class DbViewer {
         db.commit();
     }
 
+    public void updateObject(Object obj){
+        db.store(obj);
+        db.commit();
+    }
+
 }

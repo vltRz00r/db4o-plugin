@@ -1,5 +1,7 @@
 package pl.vltr.db4oplugin;
 
+import com.db4o.reflect.generic.GenericClass;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
@@ -56,11 +58,11 @@ public class ActionFactory {
         return delAction;
     }
 
-    public static Action editAction(Object object, Map<String, Object> values) {
+    public static Action editAction(Object object, Map<String, Object> values, GenericClass clazz) {
         Action editAction = new Action() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EditFrame ef = new EditFrame(object, values);
+                EditFrame ef = new EditFrame(object, values, clazz);
                 ef.setVisible(true);
             }
 
