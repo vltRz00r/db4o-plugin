@@ -1,19 +1,17 @@
 package pl.vltr.db4oplugin;
 
 import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.swing.*;
-import javax.swing.text.html.HTMLDocument;
+
+import net.miginfocom.swing.MigLayout;
 
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.db4o.reflect.generic.GenericClass;
-import net.miginfocom.swing.MigLayout;
-
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 
@@ -32,7 +30,8 @@ public class EditFrame extends JFrame {
     private GenericClass clazz;
     private Map<String, Object> values;
     private Map<String, JBTextField> fields;
-    private Map<String, Integer> types;
+    private Map<String, Integer> primitiveTypes;
+    private Map<String, ReflectClass> complexTypes;
 
     public EditFrame(Object object, Map<String, Object> values, GenericClass clazz, Consumer<Void> afterExec) {
         super("Edit object");
@@ -40,7 +39,8 @@ public class EditFrame extends JFrame {
         setValues(values);
         setClazz(clazz);
         this.fields = new HashMap<String, JBTextField>();
-        this.types = new HashMap<String, Integer>();
+        this.primitiveTypes = new HashMap<String, Integer>();
+        this.complexTypes = new HashMap<String, ReflectClass>();
 
         lay = new MigLayout();
         setLayout(lay);
@@ -63,36 +63,31 @@ public class EditFrame extends JFrame {
         setSize(getWidth() + 100, getHeight());
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+        setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
     }
 
     private void saveObject() {
-        for(String key : values.keySet()){
+        for (String key : values.keySet()) {
             Object newVal = fields.get(key).getText();
-            Integer type = types.get(key);
+            Integer type = primitiveTypes.get(key);
             ReflectClass rc = clazz;
             ReflectField rField = rc.getDeclaredField(key);
-            while(rField == null) {
+            while (rField == null) {
                 rc = rc.getSuperclass();
                 rField = rc.getDeclaredField(key);
             }
 
-            if(type == TYPE_INTEGER) {
-                newVal = Integer.parseInt((String)newVal);
-            }
-            else if(type == TYPE_STRING) {
+            if (type == TYPE_INTEGER) {
+                newVal = Integer.parseInt((String) newVal);
+            } else if (type == TYPE_STRING) {
                 newVal = String.valueOf(newVal);
-            }
-            else if(type == TYPE_DOUBLE) {
-                newVal = Double.valueOf((String)newVal);
-            }
-            else if(type == TYPE_FLOAT) {
-                newVal = Float.valueOf((String)newVal);
-            }
-            else if(type == TYPE_CHAR) {
-                newVal = Character.valueOf(((String)newVal).charAt(0));
-            }
-            else if (type == TYPE_OTHER) {
+            } else if (type == TYPE_DOUBLE) {
+                newVal = Double.valueOf((String) newVal);
+            } else if (type == TYPE_FLOAT) {
+                newVal = Float.valueOf((String) newVal);
+            } else if (type == TYPE_CHAR) {
+                newVal = Character.valueOf(((String) newVal).charAt(0));
+            } else if (type == TYPE_OTHER) {
                 newVal = values.get(key);
             }
 
@@ -114,24 +109,31 @@ public class EditFrame extends JFrame {
         panel.add(new JBLabel(key + ":"), "w 25%");
         if (isInteger || isString || isFloat || isDouble || isChar) {
             if (isInteger)
-                types.put(key, TYPE_INTEGER);
+                primitiveTypes.put(key, TYPE_INTEGER);
             else if (isString)
-                types.put(key, TYPE_STRING);
+                primitiveTypes.put(key, TYPE_STRING);
             else if (isFloat)
-                types.put(key, TYPE_FLOAT);
+                primitiveTypes.put(key, TYPE_FLOAT);
             else if (isDouble)
-                types.put(key, TYPE_DOUBLE);
+                primitiveTypes.put(key, TYPE_DOUBLE);
             else if (isChar)
-                types.put(key, TYPE_CHAR);
+                primitiveTypes.put(key, TYPE_CHAR);
 
             JBTextField field = new JBTextField(String.valueOf(value));
             fields.put(key, field);
             panel.add(field, "w 75%");
         } else {
-            types.put(key, TYPE_OTHER);
-            JBTextField field = new JBTextField(value.toString());
+            primitiveTypes.put(key, TYPE_OTHER);
+            complexTypes.put(key, clazz.getDeclaredField(key).getFieldType());
+
+            JBTextField field = new JBTextField(value != null ? value.toString() : "");
             fields.put(key, field);
             JButton moreBtn = new JButton("...");
+            moreBtn.addActionListener((e) -> {
+                SelectFrame sf = new SelectFrame(complexTypes.get(key), value);
+                sf.setVisible(true);
+            });
+            field.setEnabled(false);
             panel.add(field, "w 60%");
             panel.add(moreBtn, "w 15%");
         }

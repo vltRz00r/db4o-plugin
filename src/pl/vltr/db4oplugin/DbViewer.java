@@ -51,9 +51,43 @@ public class DbViewer {
         fieldSets.add(gc.getDeclaredFields());
 
         ReflectClass rc = gc.getSuperclass();
-        while (rc.getSuperclass() != null) {
-            fieldSets.add(rc.getDeclaredFields());
-            rc = rc.getSuperclass();
+        if(rc != null) {
+            while (rc.getSuperclass() != null) {
+                fieldSets.add(rc.getDeclaredFields());
+                rc = rc.getSuperclass();
+            }
+        }
+
+        int totalSize = 0;
+        for (ReflectField[] rf : fieldSets) {
+            totalSize += rf.length;
+        }
+
+        ReflectField[] ret = new ReflectField[totalSize];
+        int cnt = 0;
+        for (int i = fieldSets.size() - 1; i >= 0; i--) {
+            ReflectField[] rf = fieldSets.get(i);
+            for (int j = 0; j < rf.length; j++) {
+                ret[cnt] = rf[j];
+                cnt++;
+            }
+        }
+        return ret;
+    }
+
+    public static ReflectField[] getFields(ReflectClass rc) {
+        List<ReflectField[]> fieldSets = new ArrayList<ReflectField[]>();
+
+        fieldSets.add(rc.getDeclaredFields());
+
+        ReflectClass tmpRc = rc.getSuperclass();
+        if(rc != null){
+            if(tmpRc != null) {
+                while (tmpRc.getSuperclass() != null) {
+                    fieldSets.add(tmpRc.getDeclaredFields());
+                    tmpRc = tmpRc.getSuperclass();
+                }
+            }
         }
 
         int totalSize = 0;
@@ -106,7 +140,29 @@ public class DbViewer {
                 Class c = obj.getClass();
                 if (c == GenericObject.class) {
                     GenericObject go = (GenericObject) obj;
-                    if (go.getGenericClass() == gc) {
+                    if (go.getGenericClass().equals(gc)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+
+        List<Object> retList = new ArrayList<Object>();
+        for (int i = 0; i < objs.size(); i++) {
+            retList.add(objs.get(i));
+        }
+
+        return retList;
+    }
+
+    public List<Object> getObjects(ReflectClass rc) {
+        ObjectSet<Object> objs = db.query(new Predicate<Object>() {
+            public boolean match(Object obj) {
+                Class c = obj.getClass();
+                if (c == GenericObject.class) {
+                    GenericObject go = (GenericObject) obj;
+                    if (go.getGenericClass().equals(rc)) {
                         return true;
                     }
                 }
