@@ -1,6 +1,7 @@
 package pl.vltr.db4oplugin;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -23,8 +24,9 @@ public class EditFrame extends JFrame {
     private final static Integer TYPE_DOUBLE = 3;
     private final static Integer TYPE_CHAR = 4;
     private final static Integer TYPE_BOOLEAN = 5;
+    private final static Integer TYPE_COLLECTION = 6;
 
-    private final static Integer TYPE_OTHER = 6;
+    private final static Integer TYPE_OTHER = 7;
 
     private MigLayout lay;
 
@@ -90,7 +92,7 @@ public class EditFrame extends JFrame {
             } else if (type == TYPE_CHAR) {
                 newVal = Character.valueOf(((String) newVal).charAt(0));
             } else if (type == TYPE_BOOLEAN) {
-                newVal = Boolean.valueOf((String)newVal);
+                newVal = Boolean.valueOf((String) newVal);
             } else if (type == TYPE_OTHER) {
                 newVal = values.get(key);
             }
@@ -109,6 +111,7 @@ public class EditFrame extends JFrame {
         Boolean isDouble = (value instanceof Double);
         Boolean isChar = (value instanceof Character);
         Boolean isBoolean = (value instanceof Boolean);
+        Boolean isCollection = (value instanceof Collection);
 
         panel.setLayout(new MigLayout());
         panel.add(new JBLabel(key + ":"), "w 25%");
@@ -130,15 +133,21 @@ public class EditFrame extends JFrame {
             fields.put(key, field);
             panel.add(field, "w 75%");
         } else {
-            primitiveTypes.put(key, TYPE_OTHER);
+            if(isCollection){
+                primitiveTypes.put(key, TYPE_COLLECTION);
+            }else{
+                primitiveTypes.put(key, TYPE_OTHER);
+            }
             complexTypes.put(key, clazz.getDeclaredField(key).getFieldType());
 
             JBTextField field = new JBTextField(value != null ? value.toString() : "");
             fields.put(key, field);
             JButton moreBtn = new JButton("...");
-            moreBtn.setEnabled(false);
+            if(isCollection) {
+                moreBtn.setEnabled(false);
+            }
             moreBtn.addActionListener((e) -> {
-                SelectFrame sf = new SelectFrame(complexTypes.get(key), value);
+                SelectFrame sf = new SelectFrame(complexTypes.get(key), value, clazz.getDeclaredField(key));
                 sf.setVisible(true);
             });
             field.setEnabled(false);

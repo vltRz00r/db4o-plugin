@@ -1,19 +1,16 @@
 package pl.vltr.db4oplugin;
 
 import java.awt.*;
-import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import com.db4o.reflect.ReflectClass;
-import javafx.scene.control.TableSelectionModel;
 import net.miginfocom.swing.MigLayout;
 
+import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
-import com.db4o.reflect.generic.GenericClass;
 import com.db4o.reflect.generic.GenericObject;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -24,10 +21,12 @@ public class SelectFrame extends JFrame {
 
     private ReflectClass reflectClass;
     private Object object;
+    private ReflectField reflectField;
 
-    public SelectFrame(ReflectClass _reflectClass, Object _object) {
+    public SelectFrame(ReflectClass _reflectClass, Object _object, ReflectField _field) {
         setReflectClass(_reflectClass);
         setObject(_object);
+        setReflectField(_field);
         lay = new MigLayout();
         setLayout(lay);
 
@@ -47,7 +46,8 @@ public class SelectFrame extends JFrame {
         JBTable tab = new JBTable(dtm);
         tab.getTableHeader().setVisible(true);
 
-        for (Object obj : DbViewer.getInstance().getObjects(reflectClass)) {
+        List<Object> objects = DbViewer.getInstance().getObjects(reflectClass);
+        for (Object obj : objects) {
             GenericObject go = (GenericObject) obj;
             String[] vals = new String[rf.length];
             for (int i = 0; i < rf.length; i++) {
@@ -62,8 +62,23 @@ public class SelectFrame extends JFrame {
         }
 
         JBScrollPane scrollPane = new JBScrollPane(tab);
+        JButton selectBtn = new JButton("Select");
+        selectBtn.addActionListener((e) -> {
+            int selRow = tab.getSelectedRow();
+            if (selRow > -1) {
+                Object newVal = objects.get(selRow);
+                if (newVal != null) {
+                    if (reflectField == null) {
+                        System.out.println("FIELD NULL : O");
+                    }
+                    reflectField.set(object, newVal);
+                    DbViewer.getInstance().updateObject(object);
+                }
+            }
+            dispose();
+        });
         add(scrollPane, "w 100%, wrap");
-        add(new JButton("Select"), "w 100%, wrap");
+        add(selectBtn, "w 100%, wrap");
         setSize(700, 400);
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -84,5 +99,13 @@ public class SelectFrame extends JFrame {
 
     public void setReflectClass(ReflectClass reflectClass) {
         this.reflectClass = reflectClass;
+    }
+
+    public ReflectField getReflectField() {
+        return reflectField;
+    }
+
+    public void setReflectField(ReflectField reflectField) {
+        this.reflectField = reflectField;
     }
 }

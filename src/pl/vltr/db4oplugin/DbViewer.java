@@ -165,6 +165,9 @@ public class DbViewer {
                     if (go.getGenericClass().equals(rc)) {
                         return true;
                     }
+                    if( go.getGenericClass().getSuperclass().equals(rc)){
+                        return true;
+                    }
                 }
                 return false;
             }
