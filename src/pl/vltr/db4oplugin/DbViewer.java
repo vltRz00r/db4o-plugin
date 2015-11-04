@@ -51,7 +51,7 @@ public class DbViewer {
         fieldSets.add(gc.getDeclaredFields());
 
         ReflectClass rc = gc.getSuperclass();
-        if(rc != null) {
+        if (rc != null) {
             while (rc.getSuperclass() != null) {
                 fieldSets.add(rc.getDeclaredFields());
                 rc = rc.getSuperclass();
@@ -75,14 +75,25 @@ public class DbViewer {
         return ret;
     }
 
+    public static ReflectField getField(ReflectClass clazz, String name){
+        ReflectField ret = null;
+        while(ret == null) {
+            ret = clazz.getDeclaredField(name);
+            if(ret == null){
+                clazz = clazz.getSuperclass();
+            }
+        }
+        return ret;
+    }
+
     public static ReflectField[] getFields(ReflectClass rc) {
         List<ReflectField[]> fieldSets = new ArrayList<ReflectField[]>();
 
         fieldSets.add(rc.getDeclaredFields());
 
         ReflectClass tmpRc = rc.getSuperclass();
-        if(rc != null){
-            if(tmpRc != null) {
+        if (rc != null) {
+            if (tmpRc != null) {
                 while (tmpRc.getSuperclass() != null) {
                     fieldSets.add(tmpRc.getDeclaredFields());
                     tmpRc = tmpRc.getSuperclass();
@@ -186,7 +197,7 @@ public class DbViewer {
         db.commit();
     }
 
-    public void updateObject(Object obj){
+    public void updateObject(Object obj) {
         db.store(obj);
         db.commit();
     }

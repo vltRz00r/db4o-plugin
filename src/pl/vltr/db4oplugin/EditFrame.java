@@ -1,7 +1,6 @@
 package pl.vltr.db4oplugin;
 
 import java.awt.*;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -17,16 +16,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 
 public class EditFrame extends JFrame {
-
-    private final static Integer TYPE_INTEGER = 0;
-    private final static Integer TYPE_STRING = 1;
-    private final static Integer TYPE_FLOAT = 2;
-    private final static Integer TYPE_DOUBLE = 3;
-    private final static Integer TYPE_CHAR = 4;
-    private final static Integer TYPE_BOOLEAN = 5;
-    private final static Integer TYPE_COLLECTION = 6;
-
-    private final static Integer TYPE_OTHER = 7;
 
     private MigLayout lay;
 
@@ -49,8 +38,13 @@ public class EditFrame extends JFrame {
         lay = new MigLayout();
         setLayout(lay);
 
-        for (String key : values.keySet()) {
+        for (ReflectField rf : DbViewer.getFields(clazz)) {
+            String key = rf.getName();
             Object val = values.get(key);
+
+            ReflectClass fieldClass = rf.getFieldType();
+            primitiveTypes.put(key, FieldUtil.getType(fieldClass));
+
             JPanel panel = makeRow(key, val);
             add(panel, "w 100%, wrap");
         }
@@ -60,6 +54,7 @@ public class EditFrame extends JFrame {
             saveObject();
             dispose();
             afterExec.accept(null);
+            System.out.println("--CLICKED--");
         });
         add(saveBtn, "w 100%, wrap");
         pack();
@@ -71,29 +66,31 @@ public class EditFrame extends JFrame {
     }
 
     private void saveObject() {
+        for (String fKey : fields.keySet()) {
+            String val = fields.get(fKey).getText().replaceAll("null", "");
+            values.put(fKey, val);
+        }
+
+        System.out.println("values size: " + values.size());
         for (String key : values.keySet()) {
             Object newVal = fields.get(key).getText();
             Integer type = primitiveTypes.get(key);
             ReflectClass rc = clazz;
-            ReflectField rField = rc.getDeclaredField(key);
-            while (rField == null) {
-                rc = rc.getSuperclass();
-                rField = rc.getDeclaredField(key);
-            }
+            ReflectField rField = DbViewer.getField(rc, key);
 
-            if (type == TYPE_INTEGER) {
+            if (type == FieldUtil.TYPE_INTEGER) {
                 newVal = Integer.parseInt((String) newVal);
-            } else if (type == TYPE_STRING) {
+            } else if (type == FieldUtil.TYPE_STRING) {
                 newVal = String.valueOf(newVal);
-            } else if (type == TYPE_DOUBLE) {
+            } else if (type == FieldUtil.TYPE_DOUBLE) {
                 newVal = Double.valueOf((String) newVal);
-            } else if (type == TYPE_FLOAT) {
+            } else if (type == FieldUtil.TYPE_FLOAT) {
                 newVal = Float.valueOf((String) newVal);
-            } else if (type == TYPE_CHAR) {
+            } else if (type == FieldUtil.TYPE_CHAR) {
                 newVal = Character.valueOf(((String) newVal).charAt(0));
-            } else if (type == TYPE_BOOLEAN) {
+            } else if (type == FieldUtil.TYPE_BOOLEAN) {
                 newVal = Boolean.valueOf((String) newVal);
-            } else if (type == TYPE_OTHER) {
+            } else if (type == FieldUtil.TYPE_OTHER) {
                 newVal = values.get(key);
             }
 
@@ -105,49 +102,30 @@ public class EditFrame extends JFrame {
 
     private JPanel makeRow(String key, Object value) {
         JPanel panel = new JPanel();
-        Boolean isInteger = (value instanceof Integer);
-        Boolean isString = (value instanceof String);
-        Boolean isFloat = (value instanceof Float);
-        Boolean isDouble = (value instanceof Double);
-        Boolean isChar = (value instanceof Character);
-        Boolean isBoolean = (value instanceof Boolean);
-        Boolean isCollection = (value instanceof Collection);
 
         panel.setLayout(new MigLayout());
         panel.add(new JBLabel(key + ":"), "w 25%");
-        if (isInteger || isString || isFloat || isDouble || isChar || isBoolean) {
-            if (isInteger)
-                primitiveTypes.put(key, TYPE_INTEGER);
-            else if (isString)
-                primitiveTypes.put(key, TYPE_STRING);
-            else if (isFloat)
-                primitiveTypes.put(key, TYPE_FLOAT);
-            else if (isDouble)
-                primitiveTypes.put(key, TYPE_DOUBLE);
-            else if (isChar)
-                primitiveTypes.put(key, TYPE_CHAR);
-            else if (isBoolean)
-                primitiveTypes.put(key, TYPE_BOOLEAN);
-
+        Integer type = primitiveTypes.get(key);
+        if (type < 5) {
             JBTextField field = new JBTextField(String.valueOf(value));
             fields.put(key, field);
             panel.add(field, "w 75%");
         } else {
-            if(isCollection){
+            /*if(isCollection){
                 primitiveTypes.put(key, TYPE_COLLECTION);
             }else{
                 primitiveTypes.put(key, TYPE_OTHER);
-            }
-            complexTypes.put(key, clazz.getDeclaredField(key).getFieldType());
+            }*/
+            complexTypes.put(key, DbViewer.getField(clazz, key).getFieldType());
 
             JBTextField field = new JBTextField(value != null ? value.toString() : "");
             fields.put(key, field);
             JButton moreBtn = new JButton("...");
-            if(isCollection) {
+            if (type.equals(FieldUtil.TYPE_COLLECTION)) {
                 moreBtn.setEnabled(false);
             }
             moreBtn.addActionListener((e) -> {
-                SelectFrame sf = new SelectFrame(complexTypes.get(key), value, clazz.getDeclaredField(key));
+                SelectFrame sf = new SelectFrame(complexTypes.get(key), value, DbViewer.getField(clazz, key));
                 sf.setVisible(true);
             });
             field.setEnabled(false);

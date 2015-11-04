@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.*;
@@ -26,7 +27,9 @@ import com.intellij.ui.table.JBTable;
 public class TestAction implements ToolWindowFactory {
 
     private static JButton openBtn = new JButton("Open");
-    private static JButton fetchBtn = new JButton("Get Objects");
+    private static JButton fetchBtn = new JButton("Get objects");
+    private static JButton createBtn = new JButton("New object");
+
     private static JComboBox<GenericClass> classCombo = null;
     private static JPanel topPanel = new JPanel(new MigLayout());
     private static JPanel mainPanel = new JPanel(new MigLayout());
@@ -118,6 +121,17 @@ public class TestAction implements ToolWindowFactory {
             });
 
             mainPanel.removeAll();
+            createBtn.setEnabled(true);
+            if(createBtn.getActionListeners().length == 0) {
+                createBtn.addActionListener((e) -> {
+                    Object newObj = lastChosenClass.newInstance();
+                    EditFrame ef = new EditFrame(newObj, new HashMap<String, Object>(), lastChosenClass, (Void) -> {
+                        classCombo.setSelectedItem(lastChosenClass);
+                        fetchBtn.doClick();
+                    });
+                    ef.setVisible(true);
+                });
+            }
             JBScrollPane scrollPane = new JBScrollPane(tab);
             mainPanel.add(scrollPane, "w 100%, span, wrap");
             mainPanel.validate();
@@ -134,7 +148,9 @@ public class TestAction implements ToolWindowFactory {
                     List<GenericClass> classes = DbViewer.getInstance().getClasses();
                     classCombo = new JComboBox<GenericClass>(classes.toArray(new GenericClass[classes.size()]));
                     topPanel.add(classCombo);
-                    topPanel.add(fetchBtn, "wrap");
+                    topPanel.add(fetchBtn);
+                    topPanel.add(createBtn, "wrap");
+                    createBtn.setEnabled(false);
                     topPanel.validate();
                     openBtn.setText("Close");
                     fileOpened = true;
